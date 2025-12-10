@@ -26,6 +26,7 @@ class ViewerPanel(wx.Panel):
         self.old_frame_height = self.image_height
         
         self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
+        self.size_evt_ct = 0 # Becomes inf after 2 size events
         self.zoom_factor = 100
         self.pan_vec = wx.Point2D(0,0)
         self.in_prog_start = wx.Point(0,0)
@@ -43,8 +44,46 @@ class ViewerPanel(wx.Panel):
         #self.SetSize(self.GetParent().GetSize())
         """Pan and zoom image according to resize"""
         print('Size event!', event.GetSize())
-        height_diff = event.GetSize()[0] - self.old_frame_height
-        width_diff = event.GetSize()[1] - self.old_frame_width
+        if self.size_evt_ct < 3:
+            self.size_evt_ct += 1
+            return
+        
+        
+        new_height = event.GetSize()[0]
+        new_width = event.GetSize()[1]
+        height_diff = new_height - self.old_frame_height
+        width_diff = new_width - self.old_frame_width
+        
+        # Need to calculate pan_vec, in_prog_vec, and zoom_factor
+        self.ProcessPan(wx.Size(width_diff, height_diff), True)
+        #if new_height > self.image_height:
+            # Move image down the panel
+           # self.ProcessPan(wx.Size(width_diff, height_diff), True)
+            #pass
+       # if new_width > self.image_width:
+            # Move image east across the panel
+          #  pass
+          
+        # Update pan vector (+= in_prog_vec) (Note duplicated code)
+        panvec_tuple = self.pan_vec.Get()
+        inprogvec_tuple = self.in_prog_vec.Get()
+        sum_x = panvec_tuple[0] + inprogvec_tuple[0]
+        sum_y = panvec_tuple[1] + inprogvec_tuple[1]
+        self.pan_vec = wx.Point2D(sum_x, sum_y)     
+        
+        self.in_prog_pan_vec = wx.Point2D(0,0)
+        
+        
+        # Calculate zoom factor using % area change
+        # Not a permanent solution
+        old_area = self.old_frame_height * self.old_frame_width
+        new_area = new_height * new_width
+        zoom_factor = new_area/old_area
+        self.zoom_factor = 100*zoom_factor
+        
+        self.FinishPan(False)
+        self.old_frame_height = new_height
+        self.old_frame_width = new_width
         
         
     
