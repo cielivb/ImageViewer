@@ -20,10 +20,9 @@ class ViewerPanel(wx.Panel):
         self.image_file = image_file
         self.image_height = cv2.imread(image_file).shape[0]        
         self.image_width = cv2.imread(image_file).shape[1]
+        self.scaled_height = self.image_height
+        self.scaled_width = self.image_width
         self.SetSize(self.image_width, self.image_height)
-        
-        self.old_frame_width = self.image_width
-        self.old_frame_height = self.image_height
         
         self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
         self.size_evt_ct = 0 # Becomes inf after 2 size events
@@ -40,30 +39,67 @@ class ViewerPanel(wx.Panel):
         self.Bind(wx.EVT_SIZE, self.OnSize)
     
     def OnSize(self, event):
-        
         """Pan and zoom image according to resize"""
         print('Size event!', event.GetSize())
         self.Refresh()
         
     def GetBitmapPosition(self):
         """Determine bitmap draw location on panel as function of panel 
-        size and image size"""
+        size and image size.
+        Want centre of image to be drawn on panel_centre.
+        """
+        # Get panel centre position
         panel_size = self.GetSize()
         panel_width = panel_size[0]
         panel_height = panel_size[1]
         panel_centre_x = panel_width/2
         panel_centre_y = panel_height/2
-        # Want centre of image to be located on panel_centre.
-        image_centre_x = self.image_width/2
-        image_centre_y = self.image_height/2
+        
+        # Get image centre
+        image_centre_x = self.scaled_width/2
+        image_centre_y = self.scaled_height/2
+        
+        # Get draw start coordinates
         draw_x = panel_centre_x - image_centre_x
         draw_y = panel_centre_y - image_centre_y
         return (draw_x, draw_y)
+    
+    def GetBitmapSize(self):
+        """Want to rescale based on panel height and width."""
+        
+        # Get panel dimensions
+        panel_size = self.GetSize()
+        panel_width = panel_size[0]
+        panel_height = panel_size[1]
+        
+        # If image is larger in any dimension than the panel, bitmap size
+        # should be modified to fit panel
+        if self.image_height > panel_height or self.image_width > panel_width:
+            # Scale image down to fit the smallest dimension
+            
+            if panel_height <= panel_width:
+                scaled_height = panel_height
+                scale = (self.image_height - panel_height) / self.image_height
+                scaled_width = (1 - scale) * self.image_width
+                
+            else:
+                scaled_width = panel_width
+                scale = (self.image_width - panel_width) / self.image_width
+                scaled_height = (1 - scale) * self.image_height
+                
+            self.scaled_height = scaled_height
+            self.scaled_width = scaled_width
+            
+        else:
+            self.scaled_height = self.image_height
+            self.scaled_width = self.image_width
+        
+        return (self.scaled_height, self.scaled_width)
         
     
     def DoDrawCanvas(self, gc):
         image = gc.CreateBitmap(wx.Bitmap(self.image_file))
-        height, width = cv2.imread(self.image_file).shape[0:2]
+        height, width = self.GetBitmapSize()
         x, y = self.GetBitmapPosition()
         gc.DrawBitmap(image, x, y, width, height)
         
@@ -204,11 +240,11 @@ class Base(wx.Frame):
         sizer = wx.BoxSizer(wx.VERTICAL)
         
         #self.panel = ViewerPanel(self, 'images/small.png')
-        self.panel = ViewerPanel(self, 'images/medium.jpg')
-        #self.panel = ViewerPanel(self, 'images/big.gif') #SHOWS FIRST SCENE ONLY
+        #self.panel = ViewerPanel(self, 'images/medium.jpg')
+        self.panel = ViewerPanel(self, 'images/big.gif') #SHOWS FIRST SCENE ONLY
         #self.panel = ViewerPanel(self, 'images/nebula.webp') #FAILS
-        self.SetSize(self.panel.GetSize())
         self.SetMinSize((300,300))
+        self.SetSize(self.panel.GetSize())        
         
         self.zoom_out_button = wx.Button(self, label='-', size=(30,30))
         self.zoom_in_button = wx.Button(self, label='+', size=(30,30))
