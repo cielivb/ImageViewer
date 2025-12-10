@@ -15,6 +15,10 @@ Next steps:
 - replace wx.Point2D and wx.Point objects with tuples where practical
 - why so twitchy?
 - add zoom bar below image so touchscreen is not required
+- add autoplay gif feature (currently only shows first scene)
+- issue: if I zoom in too much using double-click, it gets stuck and I
+cannot zoom out using pinch gesture. Fix by limiting zoom in.
+- issue: fails on webp files. Fix by adding auto-conversion feature.
 
 """
 
@@ -180,7 +184,9 @@ class Base(wx.Frame):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         #self.panel = ViewerPanel(self, 'images/small.png')
-        self.panel = ViewerPanel(self, 'images/big.jpg')
+        self.panel = ViewerPanel(self, 'images/medium.jpg')
+        #self.panel = ViewerPanel(self, 'images/big.gif') #SHOWS FIRST SCENE ONLY
+        #self.panel = ViewerPanel(self, 'images/nebula.webp') #FAILS
 
 
 def main():
