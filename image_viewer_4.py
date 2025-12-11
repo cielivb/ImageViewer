@@ -11,6 +11,7 @@ https://forums.wxwidgets.org/viewtopic.php?p=196414#p196414
 
 import wx
 import cv2
+import numpy as np
 
 import wx.lib.inspection
 
@@ -21,7 +22,15 @@ import wx.lib.inspection
 class ViewerPanel(wx.Panel):
     def __init__(self, image_file, *args, **kw):
         wx.Panel.__init__(self, *args, **kw)
+        
+        # Initialise general window attributes
         self.image_file = image_file
+        self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
+        
+        # Initialise pan vector and related attributes
+        self.pan_vec = np.array([0,0]) # Current pan position
+        self.in_prog_vec = np.array([0,0]) # Difference between pan_vec and actual pan position
+        self.is_panning = False # Whether pan is currently in progress
     
     
     ## Normalisation methods --------------------------------------------
