@@ -64,8 +64,17 @@ class ViewerPanel(wx.Panel):
         """Determine bitmap draw location on panel as function of panel 
         size and image size.
         Want centre of image to be drawn on panel_centre.
+        By default, the image drawing begins at the top left corner, hence
+        need to calculate this position.
         """
-        pass
+        # Get viewer panel centre position
+        panel_size = self.GetSize()
+        panel_centre = np.array([panel_size[0]/2,
+                                 panel_size[1]/2]) # [width, height]
+        
+        # Get image centre
+        
+        # Get draw start coordinates (panel centre - image_centre)
     
     
     def GetBitmapSize(self):
