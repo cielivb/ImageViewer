@@ -109,21 +109,69 @@ class ViewerPanel(wx.Panel):
 
 ### Base class supporting ViewerPanel ----------------------------------
 
-class Base(wx.Frame):
-    def __init__(self, *args, **kw):
+class BasePanel(wx.Panel):
+    """ Base panel to support ViewerPanel and Zoom buttons """
+    def __init__(self, image_file, *args, **kw):
         super().__init__(*args, **kw)
+        self.image_file = image_file
+        self.InitUI()
+        self.SetBindings()
+    
+    def InitUI(self):
+        """ Add ViewerPanel and Zoom button widgets to self """
+        # Create panel components
+        viewer_panel = ViewerPanel(self, self.image_file)
+        self.zoom_out_btn = wx.Button(self, label='-', size=(30,30))
+        self.zoom_in_btn = wx.Button(self, label='+', size=(30,30))
         
+        # Add viewer panel to main sizer
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
+        main_sizer.Add(viewer_panel, 20, wx.EXPAND)
+        
+        # Add zoom buttons to button sizer
+        btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        btn_sizer.Add(self.zoom_out_btn, 0, wx.ALL, 5)
+        btn_sizer.Add(self.zoom_in_btn, 0, wx.ALL, 5)
+        
+        # Finalise main sizer
+        main_sizer.Add(btn_sizer, 1, wx.ALIGN_CENTRE, 5)
+        self.SetSizer(main_sizer)        
+    
+    def SetBindings(self):
+        """ Bind zoom buttons to their event handlers """
+        self.zoom_out_btn.Bind(wx.EVT_BUTTON, self.OnZoomOut)
+        self.zoom_in_btn.Bind(wx.EVT_BUTTON, self.OnZoomIn)
+    
+    def OnZoomOut(self, event):
+        """ Zoom out by 50% """
+        print('Zoom out button pressed')
+    
+    def OnZoomIn(self, event):
+        """ Zoom in by 50% """
+        print('Zoom in button pressed')
         
 
+class Base(wx.Frame):
+    """ Base frame to support Base Panel """
+    def __init__(self, image_file, *args, **kw):
+        wx.Frame.__init__(self, *args, **kw)
+        panel = BasePanel(image_file=image_file, parent=self,
+                          id=wx.ID_ANY)
+        self.Show()
 
-def main():
+
+        
+def main(image_file):
+    """ Open and run image viewer, which will display given image file """
     app = wx.App(False)
-    base = Base(None, wx.ID_ANY)
-    base.Show()
-    
+    base = Base(image_file=image_file, parent=None, 
+                id=wx.ID_ANY, title='Image Viewer',
+                pos=wx.DefaultPosition, size=(300,300),
+                style=wx.DEFAULT_FRAME_STYLE,
+                name='ImageViewer')
     #wx.lib.inspection.InspectionTool().Show()
-    
     app.MainLoop()
 
+
 if __name__ == '__main__':
-    main()
+    main(image_file = 'images/medium.jpg')
