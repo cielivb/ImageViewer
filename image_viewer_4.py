@@ -34,6 +34,8 @@ class ViewerPanel(wx.Panel):
         """ Initialise window attributes related to graphics """
         self.image_file = image_file
         self.image = wx.Image(self.image_file)
+        self.scaled_img_dims = (self.image.GetWidth(),
+                                self.image.GetHeight())
         self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
         self.zoom_factor = 1        
     
@@ -71,9 +73,9 @@ class ViewerPanel(wx.Panel):
         panel_size = self.GetSize()
         panel_centre = np.array([panel_size[0]/2, panel_size[1]/2]) # w x h
         
-        # Get image centre
-        image_centre = np.array([self.image.GetWidth()/2, 
-                                 self.image.GetHeight()/2])
+        # Get scaled image centre
+        image_centre = np.array([self.scaled_img_dims[0]/2, 
+                                 self.scaled_img_dims[1]/2])
         
         # Get draw start coordinates (panel centre - image_centre)
         start_coords = panel_centre - image_centre
@@ -91,7 +93,7 @@ class ViewerPanel(wx.Panel):
         height, width = 300, 300 # Implement auto-adjust function later
         start_coords = self.GetBitmapPosition()
         gc.DrawBitmap(image, start_coords[0], start_coords[1],
-                      self.image.GetWidth(), self.image.GetHeight())
+                      self.scaled_img_dims[0], self.scaled_img_dims[1])
         
         
     def OnPaint(self, event):
