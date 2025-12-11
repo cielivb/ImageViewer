@@ -44,7 +44,8 @@ class ViewerPanel(wx.Panel):
         self.is_panning = False # Whether pan is currently in progress    
         
     def SetBindings(self):
-        pass
+        self.Bind(wx.EVT_SIZE, self.OnSize)
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
         
     
     ## Normalisation methods --------------------------------------------
@@ -55,7 +56,7 @@ class ViewerPanel(wx.Panel):
     ## Paint methods ----------------------------------------------------
     
     def OnSize(self, event):
-        print('size')
+        print('OnSize')
         self.Refresh()
         
         
@@ -80,13 +81,10 @@ class ViewerPanel(wx.Panel):
         
     def OnPaint(self, event):
         """ Paint the image onto the ViewerPanel """
+        print('OnPaint')
         # Initialise paint device context
         dc = wx.AutoBufferedPaintDC(self)
         dc.Clear()
-        
-        # Set to start painting from centre of window        
-        size_x, size_y = self.GetClientSize()
-        dc.SetDeviceOrigin(int(size_x/2), int(size_y/2))
         
         # Create graphics context from Paint DC
         gc = wx.GraphicsContext.Create(dc)
@@ -198,6 +196,7 @@ class BasePanel(wx.Panel):
     def OnZoomIn(self, event):
         """ Zoom in by 50% """
         print('Zoom in button pressed')
+
         
 
 class Base(wx.Frame):
@@ -211,7 +210,9 @@ class Base(wx.Frame):
         self.SetMinSize((300,300))
         self.SetMaxSize(wx.DisplaySize())
         
+        self.Layout()
         self.Show()
+
 
 
         
@@ -223,7 +224,7 @@ def main(image_file):
                 pos=wx.DefaultPosition, size=(300,300),
                 style=wx.DEFAULT_FRAME_STYLE,
                 name='ImageViewer')
-    #wx.lib.inspection.InspectionTool().Show()
+    wx.lib.inspection.InspectionTool().Show()
     app.MainLoop()
 
 
