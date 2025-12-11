@@ -3,7 +3,7 @@ Image viewer that pans and zooms.
 The pan and zoom mechanism is comparable to Google Maps.
 No scrollbar is implemented.
 
-Heavily inspired by demo code at
+Inspired by demo code logic at
 https://forums.wxwidgets.org/viewtopic.php?p=196414#p196414
 
 """
@@ -47,6 +47,9 @@ class ViewerPanel(wx.Panel):
     def SetBindings(self):
         self.Bind(wx.EVT_SIZE, self.OnSize)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
+        
+        # Zoom bindings
+        self.Bind(wx.EVT_LEFT_DCLICK, self.OnDoubleClick)
         
     
     ## Normalisation methods --------------------------------------------
@@ -183,9 +186,10 @@ class ViewerPanel(wx.Panel):
     
     ### Zoom methods ---------------------------------------------------
     
-    def OnZoom(self, a, b, position):
-        """a is the normalised old zoom; b is the normalised new zoom"""
-        pass
+    def OnZoom(self, old_zoom, new_zoom, position):
+        """ Set self.pan_vec such that the point below the cursor (i.e, 
+        position) is the new absolute pan site """
+        print('Zoom zoom!')
     
         
     def OnPinch(self, event):
@@ -194,7 +198,9 @@ class ViewerPanel(wx.Panel):
         
     def OnDoubleClick(self, event):
         """Zoom in by 50%"""
-        pass
+        old_zoom = self.zoom_factor
+        self.zoom_factor = old_zoom * 1.5
+        self.OnZoom(old_zoom, self.zoom_factor, event.GetPosition())
         
 
 
