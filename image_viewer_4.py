@@ -23,17 +23,25 @@ class ViewerPanel(wx.Panel):
     def __init__(self, image_file, *args, **kw):
         wx.Panel.__init__(self, *args, **kw)
         
-        # Initialise general window attributes
+        self.InitGraphicsAttr(image_file)
+        self.InitVecAttr()
+        
+        
+    ### Initialisation methods -----------------------------------------
+    
+    def InitGraphicsAttr(self, image_file):
+        """ Initialise window attributes related to graphics """
         self.image_file = image_file
         self.image = wx.Bitmap(self.image_file)
         self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
-        self.zoom_factor = 1
-        
-        # Initialise pan vector and related attributes
+        self.zoom_factor = 1        
+    
+    def InitVecAttr(self):
+        """ Initialise pan vector and related attributes """
         self.pan_vec = np.array([0,0]) # Current pan position
         self.in_prog_vec = np.array([0,0]) # Difference between pan_vec and actual pan position
-        self.is_panning = False # Whether pan is currently in progress
-    
+        self.is_panning = False # Whether pan is currently in progress        
+        
     
     ## Normalisation methods --------------------------------------------
     
@@ -43,6 +51,7 @@ class ViewerPanel(wx.Panel):
     ## Paint methods ----------------------------------------------------
     
     def OnSize(self, event):
+        print('size')
         self.Refresh()
         
         
@@ -170,7 +179,8 @@ class BasePanel(wx.Panel):
         
         # Finalise main sizer
         main_sizer.Add(btn_sizer, 1, wx.ALIGN_CENTRE, 5)
-        self.SetSizer(main_sizer)        
+        self.SetSizer(main_sizer)
+        
     
     def SetBindings(self):
         """ Bind zoom buttons to their event handlers """
@@ -192,6 +202,11 @@ class Base(wx.Frame):
         wx.Frame.__init__(self, *args, **kw)
         panel = BasePanel(image_file=image_file, parent=self,
                           id=wx.ID_ANY)
+        
+        # Set frame size limits
+        self.SetMinSize((300,300))
+        self.SetMaxSize(wx.DisplaySize())
+        
         self.Show()
 
 
