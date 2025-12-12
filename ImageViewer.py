@@ -11,8 +11,9 @@ https://forums.wxwidgets.org/viewtopic.php?p=196414#p196414
 
 import wx
 import numpy as np
+from PIL import Image as PILImage
+import os
 
-import wx.lib.inspection
 
 
 
@@ -32,7 +33,7 @@ class ViewerPanel(wx.Panel):
     def InitGraphicsAttr(self, image_file):
         """ Initialise window attributes related to graphics """
         self.image_file = image_file
-        self.image = wx.Image(self.image_file)
+        self.image = self.LoadImage(self.image_file)
         self.scaled_img_dims = (self.image.GetWidth(),
                                 self.image.GetHeight())
         self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
@@ -78,6 +79,22 @@ class ViewerPanel(wx.Panel):
         self.InitVecAttr()
         self.Refresh()
         
+    
+    def LoadImage(self, image_file):
+        """ Load image file as wx.Image object """
+        
+        # Convert .webp image file to .png file
+        if image_file.endswith('.webp'):
+            image = PILImage.open(image_file)
+            png_filename = image_file.split('/')[-1]
+            png_filename = 'temp/' + png_filename.split('.')[0] + '.png'
+            image.save(png_filename, 'PNG')
+            return wx.Image(png_filename)
+        
+        else:
+            return wx.Image(self.image_file)
+        
+    
     
     ## Paint methods ----------------------------------------------------
     
@@ -403,14 +420,18 @@ class Base(wx.Frame):
 def main(image_file):
     """ Open and run image viewer, which will display given image file """
     app = wx.App(False)
+    wx.InitAllImageHandlers()
     base = Base(image_file=image_file, parent=None, 
                 id=wx.ID_ANY, title='Image Viewer',
                 pos=wx.DefaultPosition, size=(400,300),
                 style=wx.DEFAULT_FRAME_STYLE,
                 name='ImageViewer')
-    #wx.lib.inspection.InspectionTool().Show()
     app.MainLoop()
 
 
 if __name__ == '__main__':
-    main(image_file = 'images/medium.jpg')
+    #main(image_file = 'images/small.png')
+    #main(image_file = 'images/medium.jpg')
+    #main(image_file = 'images/medium_vertical.jpg')
+    main(image_file = 'images/nebula.webp') # FAILS
+    
