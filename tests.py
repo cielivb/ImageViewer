@@ -21,18 +21,18 @@ class TestPanel(wx.Panel):
 
         sizer = wx.GridSizer(cols=2)
         for button in buttons:
-            self.Bind(wx.EVT_BUTTON, self.OpenViewer, button)
+            self.Bind(wx.EVT_BUTTON, self.open_viewer, button)
             sizer.Add(button, 0, wx.ALIGN_CENTRE, 5)
         self.SetSizer(sizer)
 
-    def OpenViewer(self, event):
-        if event.GetId() == 1: 
+    def open_viewer(self, event):
+        if event.GetId() == 1:
             iv.view(self, 'images/small.png')
-        elif event.GetId() == 2: 
+        elif event.GetId() == 2:
             iv.view(self, 'images/medium.jpg')
-        elif event.GetId() == 3: 
+        elif event.GetId() == 3:
             iv.view(self, 'images/medium_vertical.jpg')
-        elif event.GetId() == 4: 
+        elif event.GetId() == 4:
             iv.view(self, 'images/nebula.webp')
 
 

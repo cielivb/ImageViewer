@@ -4,8 +4,7 @@ Image viewer with a pan and zoom mechanism comparable to Google Maps.
 This script is designed to be portable into a larger GUI application.
 Simply import this module into your script and call
 ImageViewer.view(self, image_file) where image_file is a string
-representing the relative file path of the image you wish to display.
-
+representing the relative file path of the image you wish to display.\n
 """
 import os
 
@@ -104,8 +103,7 @@ class _ViewerPanel(wx.Panel):
             self.GetParent().GetParent().temp_file = filename
             return wx.Image(filename)
 
-        else:
-            return wx.Image(self.image_file)
+        return wx.Image(self.image_file)
 
 
 
@@ -305,7 +303,8 @@ class _ViewerPanel(wx.Panel):
 
     def _on_zoom_gesture(self, event):
         """ Process pinch zoom gesture """
-        if self.is_panning: self._finish_pan(False)
+        if self.is_panning: 
+            self._finish_pan(False)
         old_zoom = self.zoom_factor
         new_zoom_factor = event.GetZoomFactor()
 
@@ -392,12 +391,12 @@ class _BasePanel(wx.Panel):
 
     def _set_bindings(self):
         """ Bind zoom buttons to their event handlers """
-        self.zoom_out_btn.Bind(wx.EVT_BUTTON, self._on_zoomOut)
-        self.zoom_in_btn.Bind(wx.EVT_BUTTON, self._on_zoomIn)
+        self.zoom_out_btn.Bind(wx.EVT_BUTTON, self._on_zoom_out)
+        self.zoom_in_btn.Bind(wx.EVT_BUTTON, self._on_zoom_in)
         self.reset_btn.Bind(wx.EVT_BUTTON, self._on_reset)
 
 
-    def _on_zoomOut(self, event):
+    def _on_zoom_out(self, event):
         """ Post Zoom Out Button event to _ViewerPanel """
         event = wx.CommandEvent(wx.EVT_BUTTON.typeId,
                                 self.zoom_out_btn.Id)
@@ -405,7 +404,7 @@ class _BasePanel(wx.Panel):
         viewer_panel.GetEventHandler().ProcessEvent(event)
 
 
-    def _on_zoomIn(self, event):
+    def _on_zoom_in(self, event):
         """ Post Zoom In Button event to _ViewerPanel """
         event = wx.CommandEvent(wx.EVT_BUTTON.typeId,
                                 self.zoom_in_btn.Id)
@@ -435,13 +434,13 @@ class _Base(wx.Frame):
         self.SetMinSize((300,300))
         self.SetMaxSize(wx.DisplaySize())
 
-        self.Bind(wx.EVT_CLOSE, self.OnExit)
+        self.Bind(wx.EVT_CLOSE, self._on_exit)
 
         self.Layout()
         self.Show()
 
 
-    def OnExit(self, event):
+    def _on_exit(self, event):
         """ Discard temp image file if present before closing """
         if self.temp_file is not None:
             os.remove(self.temp_file)
