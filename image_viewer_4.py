@@ -186,10 +186,24 @@ class ViewerPanel(wx.Panel):
     
     ### Zoom methods ---------------------------------------------------
     
-    def OnZoom(self, old_zoom, new_zoom, position):
+    def OnZoom(self, old_zoom, new_zoom, evt_pos):
         """ Set self.pan_vec such that the point below the cursor (i.e, 
-        position) is the new absolute pan site """
-        print('Zoom zoom!')
+        evt_pos) is the new absolute pan site """
+        
+        # Convert evt_pos from tuple to numpy array
+        pos = np.array([evt_pos[0], evt_pos[1]])
+        
+        # Add pos to self.pan_vec
+        st_pt = self.pan_vec + pos
+        
+        # I don't fully understand how this works but it works
+        xy_pt = st_pt / old_zoom
+        new_st_pt = xy_pt * new_zoom
+        
+        # Set self.panvec to new_st_pt - pos
+        self.pan_vec = new_st_pt - pos
+        
+        self.Refresh()
     
         
     def OnPinch(self, event):
