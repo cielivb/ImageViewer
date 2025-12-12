@@ -338,7 +338,7 @@ class BasePanel(wx.Panel):
         # Add items to bottom bar
         bottom_sizer = wx.BoxSizer(wx.HORIZONTAL)
         bottom_sizer.Add(btn_sizer, 2, wx.ALL, 5)
-        bottom_sizer.Add(self.reset_btn, 1, wx.ALL, 5)
+        bottom_sizer.Add(self.reset_btn, 1, wx.ALL|wx.ALIGN_CENTRE, 5)
         
         # Finalise main sizer
         main_sizer.Add(bottom_sizer, 1, wx.ALIGN_CENTRE, 5)
