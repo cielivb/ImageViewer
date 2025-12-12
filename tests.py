@@ -33,13 +33,13 @@ class TestPanel(wx.Panel):
     
         
 class TestFrame(wx.Frame):
-    def __init__(self, parent, size):
-        wx.Frame.__init__(self, parent, size=size)
+    def __init__(self, parent, size, pos):
+        wx.Frame.__init__(self, parent, size=size, pos=pos)
         panel = TestPanel(self)
         self.SetAutoLayout(False)
         self.Show()
 
 if __name__ == '__main__':
     test_app = wx.App(False)
-    frame = TestFrame(None, size=(300,100))
+    frame = TestFrame(None, size=(300,100), pos=(500,200))
     test_app.MainLoop()
