@@ -51,6 +51,8 @@ class ViewerPanel(wx.Panel):
         # Zoom bindings
         self.Bind(wx.EVT_LEFT_DCLICK, self.OnDoubleClick)
         self.Bind(wx.EVT_GESTURE_ZOOM, self.OnZoomGesture)
+        self.Bind(wx.EVT_BUTTON, self.OnZoomOutButton, id=1)
+        self.Bind(wx.EVT_BUTTON, self.OnZoomInButton, id=2)
         
     
     ## Normalisation methods --------------------------------------------
@@ -228,6 +230,17 @@ class ViewerPanel(wx.Panel):
         self.zoom_factor = old_zoom * 1.5
         self.OnZoom(old_zoom, self.zoom_factor, event.GetPosition())
         
+        
+    def OnZoomOutButton(self, event):
+        """ Zoom out by 50% """
+        old_zoom = self.zoom_factor
+        self.zoom_factor = old_zoom * 0.5
+        centre = (200, 150) # implement self.GetViewerCentre() later
+        self.OnZoom(old_zoom, self.zoom_factor, centre)
+    
+    
+    def OnZoomInButton(self, event):
+        pass
 
 
 
@@ -236,20 +249,27 @@ class ViewerPanel(wx.Panel):
 
 class BasePanel(wx.Panel):
     """ Base panel to support ViewerPanel and Zoom buttons """
+    
     def __init__(self, image_file, *args, **kw):
         super().__init__(*args, **kw)
         self.image_file = image_file
         self.InitUI()
         self.SetBindings()
     
+    
     def InitUI(self):
         """ Add ViewerPanel and Zoom button widgets to self """
+        
         # Create panel components
         viewer_panel = ViewerPanel(image_file=self.image_file, 
                                    parent=self,
                                    id=wx.ID_ANY)
-        self.zoom_out_btn = wx.Button(self, label='-', size=(30,30))
-        self.zoom_in_btn = wx.Button(self, label='+', size=(30,30))
+        
+        self.zoom_out_btn = wx.Button(self, label='-', 
+                                      size=(30,30), id=1)
+        self.zoom_in_btn = wx.Button(self, label='+', 
+                                     size=(30,30), id=2)
+        
         
         # Add viewer panel to main sizer
         main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -259,6 +279,7 @@ class BasePanel(wx.Panel):
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
         btn_sizer.Add(self.zoom_out_btn, 0, wx.ALL, 5)
         btn_sizer.Add(self.zoom_in_btn, 0, wx.ALL, 5)
+        
         
         # Finalise main sizer
         main_sizer.Add(btn_sizer, 1, wx.ALIGN_CENTRE, 5)
@@ -270,9 +291,14 @@ class BasePanel(wx.Panel):
         self.zoom_out_btn.Bind(wx.EVT_BUTTON, self.OnZoomOut)
         self.zoom_in_btn.Bind(wx.EVT_BUTTON, self.OnZoomIn)
     
+    
     def OnZoomOut(self, event):
-        """ Zoom out by 50% """
-        print('Zoom out button pressed')
+        """ Post Zoom Out Button event to ViewerPanel """
+        event = wx.CommandEvent(wx.EVT_BUTTON.typeId, 
+                                self.zoom_out_btn.Id)
+        viewer_panel = self.GetChildren()[0]
+        viewer_panel.GetEventHandler().ProcessEvent(event)
+        
     
     def OnZoomIn(self, event):
         """ Zoom in by 50% """
