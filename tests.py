@@ -1,4 +1,4 @@
-
+""" Test App for ImageViewer widget """
 
 import ImageViewer as iv
 import wx
