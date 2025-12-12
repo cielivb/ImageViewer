@@ -41,6 +41,7 @@ class ViewerPanel(wx.Panel):
     def InitVecAttr(self):
         """ Initialise pan vector and related attributes """
         self.pan_vec = np.array([0,0]) # Current pan position
+        self.in_prog_start = np.array([0,0]) # Pan start position (updated in OnLeftDown to represent event position)
         self.in_prog_vec = np.array([0,0]) # Difference between pan_vec and actual pan position
         self.is_panning = False # Whether pan is currently in progress    
         
@@ -53,6 +54,9 @@ class ViewerPanel(wx.Panel):
         self.Bind(wx.EVT_GESTURE_ZOOM, self.OnZoomGesture)
         self.Bind(wx.EVT_BUTTON, self.OnZoomOutButton, id=1)
         self.Bind(wx.EVT_BUTTON, self.OnZoomInButton, id=2)
+        
+        # Pan binding
+        self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
         
     
     ## Utility methods --------------------------------------------
@@ -171,16 +175,38 @@ class ViewerPanel(wx.Panel):
     
     
     def FinishPan(self, do_refresh):
-        pass
+        
+        # Restore cursor to arrow and release mouse capture
+        if self.is_panning: self.SetCursor(wx.Cursor(wx.CURSOR_ARROW))
+        if self.HasCapture(): self.ReleaseMouse()
+        
+        # Remove bindings associated with left mouse down
+        self.Unbind(wx.EVT_LEFT_UP)
+        self.Unbind(wx.EVT_MOTION)
+        self.Unbind(wx.EVT_MOUSE_CAPTURE_LOST)
+        
+        # Update pan vector
+        self.pan_vec += self.in_prog_vec
+        
+        # Restore self.in_prog_vec and self.is_panning
+        self.in_prog_vec = np.array([0,0])
+        self.is_panning = False
+        
+        # Refresh viewer panel if required
+        if do_refresh: self.Refresh()
         
     
     def OnLeftUp(self, event):
-        self.ProcessPan(event.GetPosition(), False)
+        event_position = np.array([event.GetPosition()[0],
+                                   event.GetPosition()[1]])
+        self.ProcessPan(event_position, False)
         self.FinishPan(False)
     
     
     def OnMotion(self, event):
-        self.ProcessPan(event.GetPosition(), True)
+        event_position = np.array([event.GetPosition()[0],
+                                   event.GetPosition()[1]])
+        self.ProcessPan(event_position, True)
     
     
     def OnCaptureLost(self, event):
@@ -188,8 +214,25 @@ class ViewerPanel(wx.Panel):
     
     
     def OnLeftDown(self, event):
+        """ Initiate pan """
+        
         # Turn the cursor into a hand cursor
-        pass
+        cursor = wx.Cursor(wx.CURSOR_HAND)
+        self.SetCursor(cursor)
+        
+        # Initialise class pan attributes
+        self.in_prog_start = np.array([event.GetPosition()[0],
+                                       event.GetPosition()[1]])
+        self.in_prog_vec = np.array([0,0])
+        self.is_panning = True
+        
+        # Set bindings
+        self.Bind(wx.EVT_LEFT_UP, self.OnLeftUp)
+        self.Bind(wx.EVT_MOTION, self.OnMotion)
+        self.Bind(wx.EVT_MOUSE_CAPTURE_LOST, self.OnCaptureLost)
+        
+        # Let cursor exit frame while performing pan
+        self.CaptureMouse()
     
     
     
