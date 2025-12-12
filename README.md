@@ -51,13 +51,9 @@ Future enhancements could include expanding the range of viewable image file typ
 
 
 ## How to Use ImageViewer
-tests.py contains the code for a tiny WxPython app that implements the core functionality of ImageViewer. Use this as your key reference point. Key points to note:
-- Put ImageViewer.py in the same directory as your WxPython script
-- Import ImageViewer.py into your WxPython script, e.g., <code>import ImageViewer as iv</code>
-- Set your binding/s
-- In your event handler, call <code>iv.view(parent=self, image_file='imagepath')</code>, and an ImageViewer displaying the image located at your imagepath should appear.
-
 You will need to install the following packages if you don't already have them: wx, numpy, pillow. ImageViewer has been specifically tested on Python 3.13.5, wxPython 4.2.4, numpy 2.2.6, pillow 12.0.0.
+
+tests.py contains the code for a tiny WxPython app that implements ImageViewer. Use this as your reference. You will first need to import ImageViewer into your wxPython script. In your event handler, call <code>ImageViewer.view(parent=self, image_file='imagepath')</code>. An ImageViewer displaying the image at your imagepath should appear.
 
 
 
