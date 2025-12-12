@@ -2,7 +2,7 @@
 Image viewer with a pan and zoom mechanism comparable to Google Maps.
 
 This script is designed to be portable into a larger GUI application. Simply 
-copy this module into the same directory as your script and call 
+import this module into your script and call 
 ImageViewer.view(self, image_file) where image_file is a string representing the 
 relative file path of the image you wish to display.
 
@@ -10,10 +10,10 @@ Inspired by demo code logic at
 https://forums.wxwidgets.org/viewtopic.php?p=196414#p196414
 
 """
+import os
 
 import wx
 import numpy as np
-import os
 
 from PIL import Image as PILImage
 
@@ -23,6 +23,7 @@ from PIL import Image as PILImage
 ### Class ViewerPanel (where all the action is!!) ----------------------
 
 class ViewerPanel(wx.Panel):
+    """ Panel onto which the image is drawn """
     def __init__(self, image_file, *args, **kw):
         wx.Panel.__init__(self, *args, **kw)
 
