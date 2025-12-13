@@ -496,7 +496,7 @@ def view(parent, image_file):
     """
     wx.InitAllImageHandlers()
     base = ImageInspector(image_file=image_file, parent=parent,
-                id=wx.ID_ANY, title='Image Viewer',
+                id=wx.ID_ANY, title=image_file,
                 pos=wx.DefaultPosition, size=(400,300),
                 style=wx.DEFAULT_FRAME_STYLE)
 
@@ -507,7 +507,7 @@ def main(image_file):
     app = wx.App(False)
     wx.InitAllImageHandlers()
     base = ImageInspector(image_file=image_file, parent=None,
-                id=wx.ID_ANY, title='Image Viewer',
+                id=wx.ID_ANY, title=image_file,
                 pos=wx.DefaultPosition, size=(400,300),
                 style=wx.DEFAULT_FRAME_STYLE)
     app.MainLoop()
