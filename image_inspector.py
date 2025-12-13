@@ -9,9 +9,11 @@ representing the relative file path of the image you wish to display.\n
 
 import os
 
+import requests
 import wx
 import numpy as np
 
+from io import BytesIO
 from PIL import Image as PILImage
 
 
@@ -91,20 +93,47 @@ class _ViewerPanel(wx.Panel):
         self.Refresh()
 
 
+    def _retrieve_from_web(self, image_file):
+        """ Load image file from internet as wx.Image object """
+        response = requests.get(image_file)
+        if response.status_code == 200: # Image successfully found
+            
+            # Process filename
+            filename = image_file.split('/')[-1] # Just the filename with ext
+            filename = filename.split('.')[0] + '.png' # Replace extension
+            filename = os.path.join(os.path.dirname(__file__), 'temp', filename)            
+            # Process bytes into wx.Image
+            image_bytes = response.content
+            image = PILImage.open(BytesIO(image_bytes))
+            image.save(filename)
+            
+            return (wx.Image(filename), filename)
+        
+        else:
+            raise Exception(f'Failed to retrieve image file {image_file}')
+
+
     def _load_image(self, image_file):
         """ Load image file as wx.Image object """
 
-        # Convert .webp image file to .png file
-        if image_file.endswith('.webp'):
-            image = PILImage.open(image_file)
-            filename = image_file.split('/')[-1] # Just filename with ext
-            filename = filename.split('.')[0] + '.png' # Replace extension
-            filename = os.path.join(os.path.dirname(__file__), 'temp', filename)
-            image.save(filename, 'PNG')
-            self.GetParent().GetParent().temp_file = filename
-            return wx.Image(filename)
+        if image_file.startswith('http'):
+            image, image_file = self._retrieve_from_web(image_file)
 
-        return wx.Image(self.image_file)
+        # Convert .webp image file to .png file
+        elif image_file.endswith('.webp'):
+            image = PILImage.open(image_file)
+            image_file = image_file.split('/')[-1] # Just filename with ext
+            image_file = image_file.split('.')[0] + '.png' # Replace extension
+            image_file = os.path.join(os.path.dirname(__file__), 'temp', image_file)
+            image.save(image_file, 'PNG')
+            image = wx.Image(image_file)
+        
+        else:
+            image = wx.Image(image_file)
+
+        self.GetParent().GetParent().temp_file = image_file
+
+        return image
 
 
 
@@ -476,4 +505,5 @@ def main(image_file):
     app.MainLoop()
 
 if __name__ == '__main__':
-    main('images/medium.jpg')
+    #main('images/medium.jpg')
+    main('https://scitechdaily.com/images/image-of-the-planetary-nebula-NGC-5189.jpg')
