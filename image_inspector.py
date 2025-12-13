@@ -513,5 +513,5 @@ def main(image_file):
     app.MainLoop()
 
 if __name__ == '__main__':
-    main('images/medium.jpg')
-    #main('https://scitechdaily.com/images/image-of-the-planetary-nebula-NGC-5189.jpg')
+    #main('images/medium.jpg')
+    main('https://scitechdaily.com/images/image-of-the-planetary-nebula-NGC-5189.jpg')
