@@ -489,14 +489,19 @@ class ImageInspector(wx.Frame):
 
 ### Execution functions -------------------------------------------------
 
+def _prune_title(image_path):
+    """ Extracts just the filename from an image file path """
+    return image_path.split('/')[-1]
+
 
 def view(parent, image_file):
     """ Open and run image viewer, which will display given image file.
     This function should be called from a currently running wxpython app.
     """
     wx.InitAllImageHandlers()
+    title = _prune_title(image_file)    
     base = ImageInspector(image_file=image_file, parent=parent,
-                id=wx.ID_ANY, title=image_file,
+                id=wx.ID_ANY, title=title,
                 pos=wx.DefaultPosition, size=(400,300),
                 style=wx.DEFAULT_FRAME_STYLE)
 
@@ -506,12 +511,12 @@ def main(image_file):
     """ Initialises wx app to use ImageInspector """
     app = wx.App(False)
     wx.InitAllImageHandlers()
+    title = _prune_title(image_file)
     base = ImageInspector(image_file=image_file, parent=None,
-                id=wx.ID_ANY, title=image_file,
+                id=wx.ID_ANY, title=title,
                 pos=wx.DefaultPosition, size=(400,300),
                 style=wx.DEFAULT_FRAME_STYLE)
     app.MainLoop()
 
 if __name__ == '__main__':
-    #main('images/medium.jpg')
-    main('https://scitechdaily.com/images/image-of-the-planetary-nebula-NGC-5189.jpg')
+    main('images/medium.jpg')
